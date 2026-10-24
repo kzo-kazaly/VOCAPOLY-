@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VOCAPOLY</title>
+<style>
+:root{--bg:#eef3ff;--fg:#1b2240;--card:#fff;--bd:#1b2240;box-sizing:border-box;height:100vh;height:100dvh;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a33;--fg:#eef1ff;--card:#232b52;--bd:#8a95c9}}
+:root[data-theme="dark"]{--bg:#141a33;--fg:#eef1ff;--card:#232b52;--bd:#8a95c9}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{height:100%;background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;padding:6px;overflow:hidden;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#app{height:100%;display:flex;flex-direction:row;gap:8px}
+#wrap{flex:1;min-width:0;min-height:0;container-type:size;display:flex;align-items:center;justify-content:center;padding:10px}
+#b{--u:1cqw;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(6,1fr);aspect-ratio:8/6;width:min(100cqw,calc(100cqh*4/3));container-type:inline-size;border:2px solid #000;background:#dbe6ff;flex:none}
+.cell{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #000;font-size:calc(var(--u)*1.75);text-align:center;font-weight:600;overflow:hidden;line-height:1.1;min-width:0;min-height:0}
+.cell.hl{z-index:8;transform:scale(1.18);outline:4px solid #fff;box-shadow:0 0 0 7px #000,0 0 22px 10px #ffd400;animation:hl .7s ease-in-out infinite alternate}
+@keyframes hl{from{box-shadow:0 0 0 7px #000,0 0 14px 6px #ffd400}to{box-shadow:0 0 0 7px #000,0 0 30px 14px #ffd400}}
+#b.focus .cell:not(.hl){filter:brightness(.5) saturate(.6)}
+.i{font-size:1.7em}
+.tk{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:center;font-size:1.05em}
+#c{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.6);background:#dbe6ff;color:#1b2240;text-align:center;padding:calc(var(--u)*.5);min-width:0;min-height:0}
+#c h1{margin:0;font-size:calc(var(--u)*6.5);color:#fff;text-shadow:0 2px 0 #3b5bdb,0 0 6px #3b5bdb;letter-spacing:2px;line-height:1}
+#c .tag{font-size:calc(var(--u)*1.7)}
+#st{font-size:calc(var(--u)*2.2);font-weight:700}
+#c button{font-size:calc(var(--u)*2.4);padding:calc(var(--u)*1.3) calc(var(--u)*2.8);margin:0}
+button{font:inherit;font-size:15px;font-weight:700;padding:8px 14px;border:0;border-radius:10px;background:#3b5bdb;color:#fff;cursor:pointer;margin:3px}
+button.g{background:#2f9e44}button.r{background:#e03131}
+#dice{display:flex;justify-content:center}#dt{font-size:calc(var(--u)*2.2);font-weight:700;min-height:1.2em}
+.die{width:calc(var(--u)*8);aspect-ratio:1;background:#fff;border-radius:22%;box-shadow:0 3px 0 #9aa5d6,0 5px 8px #0004;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:10%;margin:0 6px}
+.die i{border-radius:50%;margin:10%}.die i.on{background:#1b2240}
+.die.roll{animation:rl .32s linear infinite}
+@keyframes rl{0%{transform:rotate(0) translateY(0)}25%{transform:rotate(90deg) translateY(-12px)}50%{transform:rotate(180deg) translateY(0)}75%{transform:rotate(270deg) translateY(-12px)}100%{transform:rotate(360deg) translateY(0)}}
+#side{display:flex;flex-direction:column;gap:8px;width:clamp(170px,22vw,280px);overflow-y:auto;padding:4px}
+#sc{display:flex;flex-direction:column;gap:6px}
+.pl{background:var(--card);border:2px solid var(--bd);border-radius:10px;padding:6px 10px;font-size:15px;min-width:0}
+.pl.on{border-color:#f59f00;box-shadow:0 0 0 3px #f59f00}
+#tb{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}#tb button{flex:1 1 auto;margin:0}
+#m,#setup{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;z-index:9;padding:12px}
+#m[hidden],#setup[hidden]{display:none}
+.box{background:var(--card);color:var(--fg);border-radius:14px;padding:18px;max-width:420px;width:100%;text-align:center;max-height:90vh;max-height:90dvh;overflow-y:auto;box-shadow:0 8px 30px #000a}
+body.fx #m{background:transparent}
+.hi{text-align:left;border-bottom:1px solid var(--bd);padding:6px 0;font-size:15px}.hi.ok{border-left:5px solid #2f9e44;padding-left:8px}.hi.no{border-left:5px solid #e03131;padding-left:8px}
+.box h3{margin:0 0 8px}.box input{width:90%;font-size:18px;padding:8px;border-radius:8px;border:2px solid var(--bd);background:var(--bg);color:var(--fg)}
+.rules{text-align:left;font-size:14px;line-height:1.4}.rules ol{padding-left:20px;margin:6px 0}
+
+/* phone / portrait layout */
+@media (orientation:portrait){
+ #app{flex-direction:column;gap:4px}
+ #side{display:contents}
+ #sc{order:0;flex-direction:row;gap:4px}
+ #wrap{order:1;padding:8px}
+ #tb{order:2;margin:0;flex-wrap:nowrap}
+ #tb button{padding:10px 6px;font-size:14px}
+ .pl{flex:1;padding:3px 6px;font-size:12px;border-radius:8px;line-height:1.25;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+ #b{--u:1.6cqw;aspect-ratio:6/8;width:min(100cqw,calc(100cqh*3/4));grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(8,1fr)}
+ #m{align-items:flex-start;padding-top:8dvh}
+ .box{padding:14px}
+ #c h1{font-size:calc(var(--u)*5.4);letter-spacing:1px}
+}
+</style></head><body>
+<div id="app">
+ <div id="wrap"><div id="b"></div></div>
+ <div id="side">
+  <div id="sc"></div>
+  <div id="tb"><button onclick="rules()">📖 Rules</button><button onclick="hist()">📜 History</button><button class="r" onclick="fin()">End game</button></div>
+ </div>
+</div>
+<div id="setup"><div class="box"><h3>VOCAPOLY</h3><p>Choose the number of players</p>
+<button onclick="setup(2)">2</button><button onclick="setup(3)">3</button><button onclick="setup(4)">4</button></div></div>
+<div id="m" hidden></div>
+<script>
+const $=s=>document.querySelector(s);
+const C={Animals:['#ff7a00','#111','🐾',60],Food:['#9a1fc9','#fff','🥪',60],Family:['#0aa84f','#fff','👨‍👩‍👧',80],School:['#ffe600','#111','🎒',80],Clothes:['#ff0a78','#fff','👗',100],Jobs:['#2cc9ff','#111','💼',100],Weather:['#d10000','#fff','⛅',120],Sports:['#0a5cff','#fff','⚽',120],Nature:['#c4109f','#fff','🏞️',140],Transport:['#9cff9c','#111','✈️',140]};
+const L='S,Animals,Food,Family,School,+,Clothes,Jobs,Weather,Sports,Nature,Transport,-,Animals,Food,Family,School,Clothes,Jobs,Weather,-,Sports,Nature,Transport'.split(',');
+const pos=(i,W,H)=>i<W?[1,i+1]:i<W+H-2?[i-W+2,W]:i<2*W+H-2?[H,W-(i-(W+H-2))]:[H-1-(i-(2*W+H-2)),1];
+const PT=()=>matchMedia('(orientation:portrait)').matches;
+let lastFace=5,lastDt='',curPort=null;
+const T={Animals:'Піл=elephant,Аю=bear,Қасқыр=wolf,Қоян=rabbit,Арыстан=lion',Food:'Алмұрт=pear,Қарбыз=watermelon,Анар=pomegranate,Қызанақ=tomato,Қияр=cucumber',Family:'Әпке=sister,Жиен ұл=nephew,Жиен қыз=niece,Немере аға=cousin,Көке=dad/father',School:'Парта=desk,Бор=chalk,Орындық=chair,Шкаф=cupboard/wardrobe,Кітап сөресі=bookshelf/bookcase',Clothes:'Белдемше=skirt,Шалбар=trousers/pants,Костюм=suit,Көйлек=shirt/dress',Jobs:'Дәрігер=doctor,Өрт сөндіруші=firefighter/fireman,Заңгер=lawyer,Полицей=policeman/police officer/police,Аспаз=cook/chef',Weather:'Бұлтты=cloudy,Жаңбырлы=rainy,Желді=windy,Тұманды=foggy,Шуақты=sunny',Sports:'Шаңғы тебу=skiing/ski,Коньки=skating/ice skating,Жүгіру=running/jogging,Жүзу=swimming,Теннис=tennis',Nature:'Жапырақ=leaf,Ағаш=tree,Өзен=river,Орман=forest,Құм=sand',Transport:'Велосипед=bicycle/bike,Тікұшақ=helicopter,Ұшақ=plane/airplane/aeroplane,Қайық=boat,Кеме=ship'};
+const S={Animals:'tortoise,tiger,cat,camel,horse',Food:'lemon,onion,banana,grapes,potato',Family:'dad,mum,aunt,uncle,brother',School:'clock,glue stick,computer,laptop,sharpener',Clothes:'gloves,hoodie,cap,scarf,socks',Jobs:'actor,plumber,mechanic,musician,pilot',Weather:'lightning,stormy,rainbow,sunny,cloudy',Sports:'golf,jogging,jumping,dancing,archery',Nature:'mushroom,beach,grass,flower,cliff',Transport:'canoe,rocket,air balloon,scooter,motorbike'};
+const G={Animals:'I am big. I have a mane. I am called the king of the jungle.|lion#I look like a horse. My body has black and white stripes.|zebra',Food:'I am round. I have cheese and tomato sauce.|pizza#I am a yellow fruit. Monkeys like me.|banana',Family:'I am a woman. I take care of my children.|mother/mum/mom#I am your mum\'s and dad\'s mum.|grandmother/grandma',School:'I use it to write in my notebook. It has ink inside.|pen#You carry me to school. I can hold your books.|backpack/bag/schoolbag',Clothes:'I have short sleeves. People wear me with jeans or shorts.|t-shirt/tshirt/t shirt#I cover your legs. You wear me on the lower part of your body.|trousers/pants',Jobs:'I help people when there is a fire.|firefighter/fireman#I work in a hospital. I help sick people.|doctor',Weather:'The sun is shining brightly. There are few clouds.|sunny#Water falls from the clouds. You may need an umbrella.|rain/rainy',Sports:'Two teams play on opposite sides of a net. Players hit a ball with their hands.|volleyball#You use a racket and a small ball over a net.|tennis',Nature:'I have a trunk, branches, and leaves.|tree#I am colourful and smell nice. Bees like me.|flower',Transport:'I have wings. I fly in the sky and carry passengers.|plane/airplane/aeroplane#I have many carriages. I travel on railway tracks.|train'};
+const tok=['🔴','🔵','🟢','🟡'];
+const WIN=200;
+let P=[],cur=0,focus=false,H=[];
+const n=s=>s.toLowerCase().replace(/[^a-z0-9\- ]/g,'').replace(/^(a|an|the) /,'').trim();
+const pick=a=>a[Math.random()*a.length|0];
+
+// build board (re-built when the screen orientation changes)
+const B=$('#b');
+function build(){const por=PT(),W=por?6:8,Hh=por?8:6;curPort=por;B.innerHTML='';
+ L.forEach((t,i)=>{const d=document.createElement('div'),[r,c]=pos(i,W,Hh);d.className='cell';d.id='c'+i;d.style.gridRow=r;d.style.gridColumn=c;
+  if(C[t]){d.style.background=C[t][0];d.style.color=C[t][1];d.innerHTML=`${t}<span class="i">${C[t][2]}</span><span class="tk"></span>`}
+  else{d.style.background='#ffffd0';d.style.color='#333';d.innerHTML=t=='S'?`<span class="i">🏁</span>START<span class="tk"></span>`:`<span class="i">🎁</span>${t=='+'?'+2':'−2'} steps<span class="tk"></span>`}
+  B.append(d)});
+ B.insertAdjacentHTML('beforeend','<div id="c"><h1>VOCAPOLY</h1><div class="tag">Small Words – Big Opportunities!</div><div id="st"></div><button onclick="roll()">🎲 Throw the dice</button><div id="dice"><div class="die" id="d1"></div></div><div id="dt"></div></div>');
+ $('#c').style.gridArea=`2/2/${Hh}/${W}`;
+ face($('#d1'),lastFace);$('#dt').textContent=lastDt;
+ if(P.length){stat();draw()}}
+addEventListener('resize',()=>{if(PT()!==curPort)build()});
+function rules(){if(!$('#m').hidden||rolling)return;
+ modal(`<h3>📖 Rules</h3><div class="rules"><ol>
+<li>The first player to collect <b>${WIN}</b> points wins the game.</li>
+<li>Throw the dice and move your token forward by the number you got.</li>
+<li>When you land on a topic square, answer a card. Each correct answer gives you <b>+1 point</b>. A wrong answer changes nothing – your score stays the same.</li>
+<li>On a +2 / −2 square, your token moves 2 steps forward / backward and then you follow the rule of the new square.</li>
+<li>START is a free square – no card, no points.</li></ol>
+Cards: <b>Translate</b> (Kazakh to English), <b>Guess the word</b> (riddle), <b>Make a sentence</b> (say a sentence with the word – the other players decide if it is correct).</div>`,[['Close',null]])}
+
+function modal(h,b){const m=$('#m');m.innerHTML='<div class="box">'+h+'<div class="btns"></div></div>';const x=m.querySelector('.btns');
+ b.forEach(([t,f,k])=>{const e=document.createElement('button');e.textContent=t;if(k)e.className=k;e.onclick=()=>{m.hidden=true;f&&f()};x.append(e)});m.hidden=false;const a=$('#a');if(a)setTimeout(()=>a.focus(),50)}
+function info(h,f){modal(h,[['OK',f]])}
+function setup(k){P=[...Array(k)].map((_,i)=>({n:'Player '+(i+1),p:0,s:0}));cur=0;focus=false;H=[];$('#setup').hidden=true;draw();stat()}
+function stat(){$('#st').textContent=tok[cur]+' '+P[cur].n+"'s turn"}
+function draw(){
+ $('#b').classList.toggle('focus',focus);document.body.classList.toggle('fx',focus);
+ L.forEach((t,i)=>{const c=$('#c'+i);c.querySelector('.tk').textContent=P.map((p,k)=>p.p==i?tok[k]:'').join('');c.classList.toggle('hl',focus&&P[cur].p==i)});
+ $('#sc').innerHTML=P.map((p,k)=>`<div class="pl${k==cur?' on':''}">${tok[k]} <b>${p.n}</b><br>⭐ ${p.s} / ${WIN}</div>`).join('')}
+function face(el,n){const q=[[4],[0,8],[0,4,8],[0,2,6,8],[0,2,4,6,8],[0,2,3,5,6,8]][n-1];el.innerHTML=[...Array(9)].map((_,i)=>`<i${q.includes(i)?' class="on"':''}></i>`).join('')}
+let rolling=false;
+function roll(){if(!P.length||rolling||!$('#m').hidden)return;rolling=true;const a=1+Math.random()*6|0;
+ $('#d1').classList.add('roll');lastDt='';$('#dt').textContent='';
+ const iv=setInterval(()=>face($('#d1'),1+Math.random()*6|0),90);
+ setTimeout(()=>{clearInterval(iv);const d=$('#d1');d.classList.remove('roll');lastFace=a;face(d,a);
+  lastDt='You got '+a;$('#dt').textContent=lastDt;
+  setTimeout(()=>{const p=P[cur];focus=true;let n=a;const step=()=>{p.p=(p.p+1)%24;draw();if(--n>0)setTimeout(step,320);else setTimeout(()=>{rolling=false;land(p.p)},350)};step()},500)},900)}
+function end(){focus=false;cur=(cur+1)%P.length;draw();stat()}
+function land(i){const t=L[i],p=P[cur];
+ if(t=='S')return info('🏁 START – free square',end);
+ if(t=='+'||t=='-')return modal(`<h3>🎁 ${t=='+'?'Move 2 steps forward':'Move 2 steps back'}</h3>`,[['Go',()=>{p.p=(i+(t=='+'?2:-2)+24)%24;draw();land(p.p)}]]);
+ ask(t,ok=>{if(ok){p.s++;draw();if(p.s>=WIN)return win(p)}end()})}
+function ask(cat,cb){const k=pick(['T','G','S']),h=`<h3>${C[cat][2]} ${cat}</h3>`;
+ const res=(ok,ans)=>info(ok?'✅ Correct! +1 point':'❌ Wrong. Answer: <b>'+ans+'</b>',()=>cb(ok));
+ if(k=='S'){const w=pick(S[cat].split(','));return modal(h+`<p>Make a sentence with the word:</p><h2>${w.toUpperCase()}</h2><p>Say your sentence. The other players decide if it is correct.</p>`,[['✔ Correct',()=>{log(cat,'Make a sentence',w,'(sentence judged by other players)','–',true);cb(true)},'g'],['✖ Wrong',()=>{log(cat,'Make a sentence',w,'(sentence judged by other players)','–',false);cb(false)},'r']])}
+ let q,a,qq,qc;if(k=='T'){const [kk,en]=pick(T[cat].split(',')).split('=');qq=kk;q=`<p>Translate the word:</p><h2>${kk}</h2>`;a=en}
+ else{const [c,en]=pick(G[cat].split('#')).split('|');qc=c;q=`<p>Guess the word:</p><p><i>${c}</i></p><p>What am I?</p>`;a=en}
+ modal(h+q+'<input id="a" autocomplete="off" placeholder="English...">',[['Check',()=>{const v=$('#a').value,ok=a.split('/').map(n).includes(n(v));log(cat,k=='T'?'Translate':'Guess the word',k=='T'?qq:qc,v||'(empty)',a.split('/').join(' / '),ok);res(ok,a.split('/')[0])}]])}
+function log(cat,type,q,given,ans,ok){H.push({p:cur,cat,type,q,given,ans,ok})}
+function hist(){if(!$('#m').hidden||rolling)return;
+ const h=H.slice().reverse().map(e=>`<div class="hi ${e.ok?'ok':'no'}">${tok[e.p]} <b>${P[e.p].n}</b> · ${C[e.cat][2]} ${e.cat} · <i>${e.type}</i><br><b>Question:</b> ${e.q}<br><b>Answer given:</b> ${e.given}<br>${e.ans!='–'?'<b>Correct answer:</b> '+e.ans+'<br>':''}${e.ok?'✅ Correct':'❌ Wrong'}</div>`).join('');
+ modal('<h3>📜 History ('+H.length+')</h3>'+(h||'<p>No questions yet.</p>'),[['Close',null]])}
+function win(p){modal(`<h3>🏆 ${p.n} wins with ${p.s} points!</h3>`,[['Play again',()=>{$('#setup').hidden=false}]])}
+function fin(){if(!P.length)return;const al=P.map((p,k)=>[p,k]).sort((a,b)=>b[0].s-a[0].s);
+ modal('<h3>🏁 Results</h3>'+al.map(([p,k],j)=>`<p>${j+1}. ${tok[k]} ${p.n}: <b>${p.s}</b> points</p>`).join(''),[['Play again',()=>{$('#setup').hidden=false}],['Continue',null,'g']])}
+build();
+</script></body></html>
